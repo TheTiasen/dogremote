@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dog Remote Control</title>
+  <style>
+    /* Reset styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* Disable scrolling */
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      touch-action: none; /* Prevents unwanted touch scrolling */
+    }
+
+    /* Body styling */
+    body {
+      font-family: Arial, sans-serif;
+      background: url("img/bg.jpg") no-repeat center center/cover;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start; /* Start from the top */
+      height: 100vh;
+    }
+
+    /* Logo positioning */
+    .logo {
+      width: 300px;
+      animation: pulse 2s infinite ease-in-out;
+      position: absolute;
+      top: -12vh; /* 10% from the top */
+    }
+
+    /* Button container positioning */
+    .button-container {
+      display: flex;
+      gap: 40px;
+      position: absolute;
+      top: 33vh; /* 33% from the top */
+    }
+
+    /* Button styling */
+    .btn-img {
+      width: 120px;
+      height: auto;
+      cursor: pointer;
+      transition: transform 1s ease;
+      animation: wiggle 1s infinite alternate ease-in-out; /* Continuous wiggling effect */
+    }
+
+    /* Animation for pulsing logo */
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.4); }
+      100% { transform: scale(1); }
+    }
+
+    /* Fast pulse effect for button click */
+    @keyframes fast-pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.4); }
+      100% { transform: scale(1); }
+    }
+
+    /* Wiggle animation for buttons */
+    @keyframes wiggle {
+      0% { transform: rotate(0deg); }
+      25% { transform: rotate(-3deg); }
+      50% { transform: rotate(3deg); }
+      75% { transform: rotate(-3deg); }
+      100% { transform: rotate(3deg); }
+    }
+
+    /* Shake animation for button click */
+    @keyframes shake {
+      0% { transform: translateX(0); }
+      10% { transform: translateX(-5px); }
+      20% { transform: translateX(5px); }
+      30% { transform: translateX(-5px); }
+      40% { transform: translateX(5px); }
+      50% { transform: translateX(-5px); }
+      60% { transform: translateX(5px); }
+      70% { transform: translateX(-5px); }
+      80% { transform: translateX(5px); }
+      90% { transform: translateX(-5px); }
+      100% { transform: translateX(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Logo with pulsating animation -->
+  <img src="img/lisa.png" alt="App Logo" class="logo" id="appLogo">
+
+  <!-- Buttons as images -->
+  <div class="button-container">
+    <img src="img/1.png" alt="Button 1" class="btn-img" id="btn1">
+    <img src="img/2.png" alt="Button 2" class="btn-img" id="btn2">
+  </div>
+
+  <!-- Status message -->
+  <div id="status"></div>
+
+  <script>
+    const backendUrl = "http://192.168.4.1";
+
+    function sendButtonPress(endpoint, button) {
+      fetch(backendUrl + endpoint, { method: "GET" })
+        .then(response => response.json())
+        .then(data => {
+          document.getElementById("status").textContent = data.status;
+        })
+        .catch(err => {
+          // document.getElementById("status").textContent = "Error: " + err;
+        });
+
+      // Apply shake animation on click
+      button.style.animation = "shake 0.8s infinite";
+      
+      // Remove shake animation after 5 seconds and restore wiggle
+      setTimeout(() => {
+        button.style.animation = "wiggle 1s infinite alternate ease-in-out";
+      }, 5000);
+    }
+
+    // Button click event listeners
+    document.getElementById("btn1").addEventListener("click", function () {
+      sendButtonPress("/press1", this);
+    });
+
+    document.getElementById("btn2").addEventListener("click", function () {
+      sendButtonPress("/press2", this);
+    });
+  </script>
+
+</body>
+</html>
